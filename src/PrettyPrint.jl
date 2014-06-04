@@ -1,6 +1,7 @@
 module PrettyPrint
 	export @>, @>>
-	CENTER_LINE = 18
+	NAME_LENGTH =  60
+	INDENT_LENGTH = 5
 
 	function curtail(value::String, len::Int)
 		length(value) > len ? string(value[1:(len - 3)], "...") : value
@@ -11,7 +12,7 @@ module PrettyPrint
 	end
 
 	function short(value::Dict)
-		" " * replace(curtail(string(value), 65), "\n", " ")
+		replace(replace(curtail(string(value), 65), "\n", " "), "   ", " ")
 	end
 
 	function short(value)
@@ -26,22 +27,22 @@ module PrettyPrint
 		"$(summary(value))"
 	end
 
-	function shortname(io::IO, name, len=CENTER_LINE)
+	function shortname(io::IO, name, len=NAME_LENGTH)
 		name = string(name)
 		if length(name) > len
 			l1 = int(len/2) - 2
 			l2 = l1 - 1
 			name = string(name[1:l1], "...", name[end-l2:end])
 		end
-		print(io, lpad(name, len))
+		print(io, name)
 	end
 
-	function indent(s::String, padding::Int = CENTER_LINE + 2)
+	function indent(s::String, padding::Int = INDENT_LENGTH)
 		first = true
 		function indentline(s::String)
-			line = first ? s : string(" " ^ padding, s)
+			start = first ? "\n" : ""
 			first = false
-			return line
+			start * " " ^ padding * s
 		end
 		if !in('\n', s)
 			return s
@@ -60,7 +61,7 @@ module PrettyPrint
 		end
 		sio = IOBuffer()
 		if !isa(value, Dict)
-			print(sio, "($(summary(value))):\n")
+			print(sio, "($(summary(value))): ")
 		end
 		writemime(sio, "text/plain", value)
 		vstr = takebuf_string(sio)
