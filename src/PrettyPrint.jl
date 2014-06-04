@@ -1,6 +1,5 @@
 module PrettyPrint
 	export @>, @>>
-	# simple debug print
 	CENTER_LINE = 18
 
 	function curtail(value::String, len::Int)
@@ -77,7 +76,7 @@ module PrettyPrint
 		vstr
 	end
 
-
+	# simple debug print
 	macro >(exs...)
 	    blk = Expr(:block)
 	    for ex in exs
