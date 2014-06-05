@@ -42,8 +42,8 @@ tt = TestType("hello", 42, "world")
 @> tt
 @>> tt
 
-using DataFrames
-using RDatasets
-iris = dataset("datasets", "iris")
-@> iris
-@>> iris
+# using DataFrames
+# using RDatasets
+# iris = dataset("datasets", "iris")
+# @> iris
+# @>> iris
