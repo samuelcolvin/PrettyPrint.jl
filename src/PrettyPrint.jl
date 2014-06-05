@@ -1,6 +1,8 @@
 module PrettyPrint
 	export @>, @>>
-	NAME_LENGTH =  60
+	NAME_LENGTH   =  60
+	SHORT_LENGTH  = 65
+	LONG_LENGTH   = 400
 	INDENT_LENGTH = 5
 
 	function curtail(value::String, len::Int)
@@ -8,11 +10,11 @@ module PrettyPrint
 	end
 
 	function short(value::String)
-		"($(summary(value))): " * curtail(repr(value), 65)
+		"($(summary(value))): " * curtail(repr(value), SHORT_LENGTH)
 	end
 
 	function short(value::Dict)
-		replace(replace(curtail(string(value), 65), "\n", " "), "   ", " ")
+		replace(replace(curtail(string(value), SHORT_LENGTH), "\n", " "), "   ", " ")
 	end
 
 	function short(value)
@@ -20,7 +22,7 @@ module PrettyPrint
 		if string(typeof(value)) == "DataFrame"
 			return shortdf(value)
 		end
-		"($(summary(value))): " * replace(curtail(string(value), 65), "\n", " ")
+		"($(summary(value))): " * replace(curtail(string(value), SHORT_LENGTH), "\n", " ")
 	end
 
 	function shortdf(value)
@@ -52,7 +54,7 @@ module PrettyPrint
 	end
 
 	function long(value::String)
-		indent("($(summary(value))):\n" * curtail(value, 200) * "\nraw string:\n  " * curtail(repr(value), 200))
+		indent("($(summary(value))):\n" * curtail(value, LONG_LENGTH) * "\nraw string:\n  " * curtail(repr(value), LONG_LENGTH))
 	end
 
 	function long(value)
@@ -66,7 +68,7 @@ module PrettyPrint
 		writemime(sio, "text/plain", value)
 		vstr = takebuf_string(sio)
 		close(sio)
-		indent(curtail(vstr, 200))
+		indent(curtail(vstr, LONG_LENGTH))
 	end
 
 	function longdf(value)

@@ -21,7 +21,7 @@ compl = 4 + 2.12312312im
 @> b othervar func1 bigmat compl
 @>> b othervar func1 bigmat compl
 
-longstr = "this is a longish string \nwith new lines in it  \r\netc.\tetc."
+longstr = "this is a longish string \nwith new lines in it \n and unicode characters π \r\netc.\tetc."
 dict_example = ["key"=>"value", 8=>2.3, (1,2)=>(3,4)]
 regexexpr = r"[a-z]*.*?hello"
 @> longstr dict_example regexexpr
