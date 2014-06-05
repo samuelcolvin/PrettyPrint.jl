@@ -40,9 +40,9 @@ module PrettyPrint
 	function indent(s::String, padding::Int = INDENT_LENGTH)
 		first = true
 		function indentline(s::String)
-			start = first ? "\n" : ""
+			start = first ? "" : " " ^ padding
 			first = false
-			start * " " ^ padding * s
+			start * s
 		end
 		if !in('\n', s)
 			return s
@@ -52,7 +52,7 @@ module PrettyPrint
 	end
 
 	function long(value::String)
-		indent("($(summary(value))): " * curtail(value, 200) * "\nraw string:\n  " * curtail(repr(value), 200))
+		indent("($(summary(value))):\n" * curtail(value, 200) * "\nraw string:\n  " * curtail(repr(value), 200))
 	end
 
 	function long(value)
@@ -61,7 +61,7 @@ module PrettyPrint
 		end
 		sio = IOBuffer()
 		if !isa(value, Dict)
-			print(sio, "($(summary(value))): ")
+			print(sio, "($(summary(value))):\n")
 		end
 		writemime(sio, "text/plain", value)
 		vstr = takebuf_string(sio)

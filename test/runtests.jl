@@ -9,8 +9,9 @@ b=1
 @> b
 @> b += 1
 @> b
-veryveryvery_long_variable_name = 42
-@> veryveryvery_long_variable_name
+# actually this does happen, not with long variable names but with long expressions
+veryveryveryveryveryveryveryveryveryveryveryveryvery_long_variable_name = 42
+@> veryveryveryveryveryveryveryveryveryveryveryveryvery_long_variable_name
 
 b=nothing
 othervar = :symname
