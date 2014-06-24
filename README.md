@@ -25,3 +25,12 @@ Examples:
 	compl = 4 + 2.12312312im
 	@> b othervar func1 bigmat compl
 	@>> b othervar func1 bigmat compl
+	
+
+Should start using
+
+    tb = backtrace()
+    for ptr in tb
+        lkup = ccall(:jl_lookup_code_address, Any, (Ptr{Void},Cint), ptr, true)
+        println(lkup)
+    end
