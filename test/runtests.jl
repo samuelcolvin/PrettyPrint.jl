@@ -48,3 +48,5 @@ tt = TestType("hello", 42, "world")
 # iris = dataset("datasets", "iris")
 # @> iris
 # @>> iris
+pbt()
+pbt("fred")

@@ -1,5 +1,5 @@
 module PrettyPrint
-	export @>, @>>
+	export @>, @>>, printbacktrace, pbt
 	NAME_LENGTH   =  60
 	SHORT_LENGTH  = 65
 	LONG_LENGTH   = 400
@@ -81,4 +81,19 @@ module PrettyPrint
 		# if !isempty(exs); push!(blk.args, :value); end
 	    return blk
 	end
+
+	function printbacktrace(name::Union(String, Nothing)=nothing)
+		tb = backtrace()
+		name == nothing ? println("Backtrace:") : println("$name Backtrace:")
+		for ptr in tb
+		    lkup = ccall(:jl_lookup_code_address, Any, (Ptr{Void},Cint), ptr, true)
+	        lkup === () && continue
+	        fname, file, line, fromc = lkup
+	        # println(repr(fname))
+	        (in(fname, [:printbacktrace, :pbt]) || fromc) && continue
+		    println(" " ^ INDENT_LENGTH, "in $fname at $file:$line")
+		end
+	end
+
+	pbt(args...) = printbacktrace(args...)
 end
