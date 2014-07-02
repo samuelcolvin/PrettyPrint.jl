@@ -2,7 +2,7 @@ module PrettyPrint
 	export @>, @>>, printbacktrace, pbt
 	NAME_LENGTH   =  60
 	SHORT_LENGTH  = 65
-	LONG_LENGTH   = 400
+	LONG_LENGTH   = 5000
 	INDENT_LENGTH = 5
 
 	function curtail(value::String, len::Int)
@@ -60,7 +60,7 @@ module PrettyPrint
 			" ($(summary(value))):" * longvalue(value)
 		end
 
-	longvalue(value) = indent(curtail(reprmime("text/plain", value), LONG_LENGTH))
+	longvalue(value) = indent(curtail(stringmime("text/plain", value), LONG_LENGTH))
 
 	# simple debug print
 	macro >(exs...)
