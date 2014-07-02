@@ -10,23 +10,18 @@ module PrettyPrint
 	end
 
 	function short(value::String)
-		"($(summary(value))): " * curtail(repr(value), SHORT_LENGTH)
+		" ($(summary(value))): " * curtail(repr(value), SHORT_LENGTH)
 	end
 
-	function short(value::Dict)
+	function short(value::Union(Dict, AbstractArray))
 		replace(replace(curtail(string(value), SHORT_LENGTH), "\n", " "), "   ", " ")
 	end
 
 	function short(value)
-		# this avoids having to import DataFrames
-		if string(typeof(value)) == "DataFrame"
-			return shortdf(value)
-		end
-		"($(summary(value))): " * replace(curtail(string(value), SHORT_LENGTH), "\n", " ")
-	end
-
-	function shortdf(value)
-		"$(summary(value))"
+		# avoid having to import DataFrames
+		isdefined(Main, :DataFrame) && isa(value, Main.DataFrame) ? 
+			": $(summary(value))" :
+			" ($(summary(value))): " * replace(curtail(string(value), SHORT_LENGTH), "\n", " ")
 	end
 
 	function shortname(io::IO, name, len=NAME_LENGTH)
@@ -42,12 +37,12 @@ module PrettyPrint
 	function indent(s::String, padding::Int = INDENT_LENGTH)
 		first = true
 		function indentline(s::String)
-			start = first ? "" : " " ^ padding
+			start = first ? " " : " " ^ padding
 			first = false
 			start * s
 		end
 		if !in('\n', s)
-			return s
+			return " " * s
 		else
 			return join(map(indentline, split(s, "\n")), "\n")
 		end
@@ -57,33 +52,21 @@ module PrettyPrint
 		indent("($(summary(value))):\n" * curtail(value, LONG_LENGTH) * "\nraw string:\n  " * curtail(repr(value), LONG_LENGTH))
 	end
 
-	function long(value)
-		if string(typeof(value)) == "DataFrame"
-			return longdf(value)
-		end
-		sio = IOBuffer()
-		if !isa(value, Dict)
-			print(sio, "($(summary(value))):\n")
-		end
-		writemime(sio, "text/plain", value)
-		vstr = takebuf_string(sio)
-		close(sio)
-		indent(curtail(vstr, LONG_LENGTH))
-	end
+	long(value::Union(Dict, AbstractArray)) = longvalue(value)
 
-	function longdf(value)
-		sio = IOBuffer()
-		show(sio, value)
-		vstr = takebuf_string(sio)
-		close(sio)
-		vstr
-	end
+	function long(value)
+		isdefined(Main, :DataFrame) && isa(value, Main.DataFrame) ? 
+			":" * longvalue(value) :
+			" ($(summary(value))):" * longvalue(value)
+		end
+
+	longvalue(value) = indent(curtail(reprmime("text/plain", value), LONG_LENGTH))
 
 	# simple debug print
 	macro >(exs...)
 	    blk = Expr(:block)
 	    for ex in exs
-	        push!(blk.args, :(println($(sprint(shortname,ex))*" ", short(begin value=$(esc(ex)) end))))
+	        push!(blk.args, :(println($(sprint(shortname,ex)), short(begin value=$(esc(ex)) end))))
 	    end
 		# if !isempty(exs); push!(blk.args, :value); end
 	    return blk
@@ -93,7 +76,7 @@ module PrettyPrint
 	macro >>(exs...)
 	    blk = Expr(:block)
 	    for ex in exs
-	        push!(blk.args, :(println($(sprint(shortname,ex))*" ", long(begin value=$(esc(ex)) end))))
+	        push!(blk.args, :(println($(sprint(shortname,ex)), long(begin value=$(esc(ex)) end))))
 	    end
 		# if !isempty(exs); push!(blk.args, :value); end
 	    return blk
